@@ -1,35 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useContext } from "react";
+import { DataContext } from "./context/DataContext";
+import Card from "./components/Card";
+import "./styles/Dashboard.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { data, connected } = useContext(DataContext);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="dashboard">
+      <header className="header">
+        <h1>⚡ FlowSense</h1>
+        <div className={`status ${connected ? "on" : "off"}`}>
+          {connected ? "🟢 Conectado" : "🔴 Desconectado"}
+        </div>
+      </header>
+
+      <main className="cards-container">
+        <Card titulo="Tensão" valor={data.tensao} unidade="V" icone="⚡" />
+        <Card titulo="Corrente" valor={data.corrente} unidade="A" icone="🔌" />
+        <Card titulo="Potência" valor={data.potencia} unidade="kW" icone="💡" />
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
