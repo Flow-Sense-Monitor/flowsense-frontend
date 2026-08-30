@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import PropTypes from "prop-types";
 import { DataContext } from "../context/DataContext";
 import "../styles/Card.css";
 
@@ -17,6 +18,13 @@ const Card = ({ titulo, valor, unidade, icone }) => {
       </div>
     </div>
   );
+};
+
+Card.propTypes = {
+  titulo: PropTypes.string.isRequired,
+  valor: PropTypes.number.isRequired,
+  unidade: PropTypes.string.isRequired,
+  icone: PropTypes.string.isRequired,
 };
 
 export default Card;

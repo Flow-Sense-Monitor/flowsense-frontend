@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef } from "react";
 import { Client } from "@stomp/stompjs";
 import { DataContext } from "../context/DataContext";
 
-export const useWebSocket = (url = "ws://localhost:8080/ws") => {
+export const useWebSocket = (url = "ws://168.138.148.127:8081/ws") => {
   const { updateData, setConnected } = useContext(DataContext);
   const clientRef = useRef(null);
 

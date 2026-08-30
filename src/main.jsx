@@ -6,7 +6,7 @@ import { useWebSocket } from "./hooks/useWebSocket";
 import "./index.css";
 
 function AppWithWebSocket() {
-  useWebSocket("ws://localhost:8080/ws");
+  useWebSocket("ws://168.138.148.127:8081/ws");
   return <App />;
 }
 
