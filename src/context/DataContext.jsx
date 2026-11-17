@@ -1,30 +1,62 @@
-import React, { createContext, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import { api } from "../services/api";
+import { usePolling } from "../hooks/usePolling";
+import { situacaoDispositivo } from "../utils/formatacao";
 
-export const DataContext = createContext();
+const DataContext = createContext(null);
 
-export const DataProvider = ({ children }) => {
-  const [data, setData] = useState({
-    tensao: 0,
-    corrente: 0,
-    potencia: 0,
-  });
+const ATUALIZAR_LEITURA_MS = 2000;
+const ATUALIZAR_DISPOSITIVOS_MS = 5000; // também define em quanto tempo a tela se recupera se o servidor cair
 
-  const [connected, setConnected] = useState(false);
+/**
+ * Estado compartilhado do dashboard: dispositivo escolhido, leitura atual (a cada 2 s)
+ * e se o servidor está respondendo.
+ */
+export function DataProvider({ children }) {
+  const dispositivos = usePolling(api.dispositivos, ATUALIZAR_DISPOSITIVOS_MS);
+  const [escolhido, setEscolhido] = useState(null);
+  const dispositivo = escolhido ?? dispositivos.dados?.[0]?.id ?? null;
 
-  const updateData = useCallback((newData) => {
-    const { tensao, corrente } = newData;
-    const potencia = (tensao * corrente) / 1000; // kW
+  const leitura = usePolling(
+    () => (dispositivo ? api.leituraAtual(dispositivo) : Promise.resolve(null)),
+    ATUALIZAR_LEITURA_MS,
+    dispositivo ?? "",
+  );
 
-    setData({
-      tensao: parseFloat(tensao.toFixed(2)),
-      corrente: parseFloat(corrente.toFixed(2)),
-      potencia: parseFloat(potencia.toFixed(2)),
-    });
+  // Relógio da tela: faz "há X s" e a detecção de "parou de mandar dados" se atualizarem sozinhos.
+  const [agora, setAgora] = useState(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setAgora(Date.now()), 1000);
+    return () => clearInterval(timer);
   }, []);
 
-  return (
-    <DataContext.Provider value={{ data, updateData, connected, setConnected }}>
-      {children}
-    </DataContext.Provider>
-  );
+  const erro = leitura.erro ?? dispositivos.erro;
+  const servidorFora = Boolean(erro?.servidorIndisponivel);
+  // 404 na leitura atual = dispositivo configurado que ainda não mandou nada.
+  const dadosLeitura = leitura.erro?.status === 404 ? null : leitura.dados;
+
+  const valor = {
+    dispositivos: dispositivos.dados ?? [],
+    dispositivo,
+    setDispositivo: setEscolhido,
+    leitura: dadosLeitura,
+    situacao: situacaoDispositivo(dadosLeitura, agora),
+    carregando: dispositivos.carregando || (dispositivo !== null && leitura.carregando),
+    servidorFora,
+    erro,
+    agora,
+    recarregarLeitura: leitura.recarregar,
+  };
+
+  return <DataContext.Provider value={valor}>{children}</DataContext.Provider>;
+}
+
+DataProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function useDados() {
+  return useContext(DataContext);
+}

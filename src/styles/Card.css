@@ -1,77 +1,92 @@
-/* Estilos dos Cards */
+/* Cartões de valores em tempo real */
 
 .card {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: var(--cor-painel);
+  border: 2px solid var(--cor-borda);
   border-radius: 15px;
-  padding: 30px;
+  padding: 22px;
   backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+  transition: border-color 0.3s ease, background 0.3s ease, opacity 0.3s ease;
   min-height: 150px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-}
-
-.card:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-5px);
-}
-
-.card.disconnected {
-  opacity: 0.5;
+  gap: 10px;
 }
 
 .card-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
 }
 
 .icone {
-  font-size: 2.5rem;
+  font-size: 1.8rem;
 }
 
 .card-header h2 {
-  margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   color: #fff;
+  font-weight: 600;
 }
 
 .card-valor {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .numero {
-  font-size: 3rem;
-  font-weight: 900;
-  color: #ffd700;
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--cor-destaque);
   font-variant-numeric: tabular-nums;
+  line-height: 1.1;
 }
 
 .unidade {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 600;
 }
 
+.card-detalhe {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Estados */
+.card-alerta {
+  border-color: var(--cor-alerta);
+  background: rgba(255, 59, 59, 0.18);
+}
+.card-alerta .numero {
+  color: #ff8a8a;
+}
+
+.card-ok {
+  border-color: rgba(67, 196, 122, 0.7);
+}
+.card-ok .numero {
+  color: var(--cor-ok);
+}
+
+.card-apagado {
+  opacity: 0.55;
+}
+
 @media (max-width: 768px) {
   .card {
-    padding: 20px;
+    padding: 18px;
+    min-height: auto;
   }
-
   .numero {
     font-size: 2rem;
   }
+}
 
-  .card-header h2 {
-    font-size: 1.1rem;
-  }
-
-  .icone {
-    font-size: 2rem;
-  }
+/* Valores em texto (ex.: "Sobrecorrente", "DESLIGADA") são mais longos que os números */
+.numero.texto {
+  font-size: 1.7rem;
+  overflow-wrap: anywhere;
 }
